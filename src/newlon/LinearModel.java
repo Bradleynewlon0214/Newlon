@@ -147,6 +147,7 @@ public class LinearModel {
 		Matrix s = xTransposed.times(x).inverse();
 		vcov = s.timesEquals(sigmaSquareHat);
 	}
+	
 	public Matrix getVCOVBetaHat() {
 		if(fit) return vcov;
 		else return null;

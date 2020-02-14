@@ -23,7 +23,7 @@ public class Main {
 		//I know this isn't the optimal way to add these, but it works for now
 		
 		
-		String workingDir = "C:\\Users\\Bradl\\OneDrive\\Desktop\\R\\";
+		String workingDir = "C:\\Users\\bradley\\Desktop\\R\\";
 		
 		
 		Scanner in = new Scanner(System.in);

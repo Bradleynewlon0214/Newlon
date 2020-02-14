@@ -26,9 +26,16 @@ public class LinearModelResult extends LinearModel {
 		
 		
 		
+		
+		
 		System.out.println("Total Sum Square: " + getTSS());
 		System.out.println("Explained Sum Square: " + getESS());
 		System.out.println("Residual Sum Square: " + getSSR());
+		
+		System.out.println("Vcov: " + getVCOVBetaHat());
+		System.out.println("Sigma Squared Hat: " + getSigmaSquaredHat());
+		System.out.println("Residual Standard Error: " + getResidualStandardError());
+		System.out.println("MSE: " + getMSE());
 		
 	}
 	
