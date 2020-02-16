@@ -11,7 +11,7 @@ public class GenerateAst {
 //			System.err.println("Usage: generate_ast <output_dir>");
 //			System.exit(1);
 //		}
-		String outputDir = "C:\\Users\\Bradl\\eclipse-workspace\\Newlon\\src\\Interpreter";
+		String outputDir = "C:\\Users\\bradley\\eclipse-workspace\\Newlon\\src\\Interpreter";
 	    defineAst(outputDir, "Expr", Arrays.asList(          
 	    	      "Binary   : Expr left, Token operator, Expr right",
 	    	      "Grouping : Expr expression",                      
