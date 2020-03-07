@@ -1,11 +1,11 @@
-package Interpreter;
+package loxInterpreter;
+
+import static loxInterpreter.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static Interpreter.TokenType.*; //not nessecary
 
 
 public class Scanner {
@@ -27,7 +27,7 @@ public class Scanner {
 	    keywords.put("else",   ELSE);                      
 	    keywords.put("false",  FALSE);                     
                        
-	    keywords.put("def",    DEF);                       
+	    keywords.put("def",    FUN);                       
 	    keywords.put("if",     IF);                        
                       
 	    keywords.put("or",     OR);                        

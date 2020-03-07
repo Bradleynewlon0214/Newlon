@@ -1,9 +1,11 @@
-package Interpreter;
+package loxInterpreter;
 
-import Interpreter.Expr.Binary;
-import Interpreter.Expr.Grouping;
-import Interpreter.Expr.Literal;
-import Interpreter.Expr.Unary;
+import loxInterpreter.Expr.Assign;
+import loxInterpreter.Expr.Binary;
+import loxInterpreter.Expr.Grouping;
+import loxInterpreter.Expr.Literal;
+import loxInterpreter.Expr.Unary;
+import loxInterpreter.Expr.Variable;
 
 public class AstPrinter implements Expr.Visitor<String>{
 
@@ -55,6 +57,18 @@ public class AstPrinter implements Expr.Visitor<String>{
 	                new Expr.Literal(45.67)));
 
 	        System.out.println(new AstPrinter().print(expression));
+	}
+
+	@Override
+	public String visitVariableExpr(Variable expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitAssignExpr(Assign expr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

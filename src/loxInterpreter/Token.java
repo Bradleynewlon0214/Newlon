@@ -1,6 +1,4 @@
-package Interpreter;
-
-
+package loxInterpreter;
 
 public class Token {
 	

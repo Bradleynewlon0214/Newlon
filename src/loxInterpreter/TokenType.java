@@ -1,4 +1,4 @@
-package Interpreter;
+package loxInterpreter;
 //no loops
 public enum TokenType {
 	
@@ -14,6 +14,6 @@ public enum TokenType {
 	IDENTIFIER, STRING, NUMBER, NIL,
 	
 	//Keywords
-	AND, ELSE, FALSE, DEF, IF, OR, PRINT, RET, TRUE, LET, EOF
+	AND, ELSE, FALSE, FUN, IF, OR, PRINT, RET, TRUE, LET, EOF
 
 }
