@@ -16,6 +16,11 @@ public class Lox {
 	static boolean hadRuntimeError = false;
 
 	public static void main(String[] args) throws IOException{
+		
+//		String testScript = "C:\\Users\\bradley\\Desktop\\fib.ns";
+//		
+//		runFile(testScript);
+		
 		if(args.length > 1) {
 			System.out.println("Usage: jlox [script]");
 			System.exit(64);
@@ -62,7 +67,7 @@ public class Lox {
 //		for(Token token: tokens) {
 //			System.out.println(token);
 //		}
-	}
+	}	
 	
 	
 	static void error(Token token, String message) {

@@ -2,8 +2,10 @@ package loxInterpreter;
 
 import loxInterpreter.Expr.Assign;
 import loxInterpreter.Expr.Binary;
+import loxInterpreter.Expr.Call;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
+import loxInterpreter.Expr.Logical;
 import loxInterpreter.Expr.Unary;
 import loxInterpreter.Expr.Variable;
 
@@ -67,6 +69,18 @@ public class AstPrinter implements Expr.Visitor<String>{
 
 	@Override
 	public String visitAssignExpr(Assign expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitLogicalExpr(Logical expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitCallExpr(Call expr) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -27,12 +27,12 @@ public class Scanner {
 	    keywords.put("else",   ELSE);                      
 	    keywords.put("false",  FALSE);                     
                        
-	    keywords.put("def",    FUN);                       
+	    keywords.put("fun",    FUN);                       
 	    keywords.put("if",     IF);                        
                       
 	    keywords.put("or",     OR);                        
 	    keywords.put("print",  PRINT);                     
-	    keywords.put("ret", RET);                    
+	    keywords.put("return", RETURN);                    
                     
 	    keywords.put("true",   TRUE);    
 	    keywords.put("let", LET);

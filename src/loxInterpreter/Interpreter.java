@@ -2,21 +2,66 @@ package loxInterpreter;
 
 import java.util.List;
 
+import DataFrame.DataFrame;
+
+import java.util.ArrayList;
+
 import loxInterpreter.Expr.Assign;
 import loxInterpreter.Expr.Binary;
+import loxInterpreter.Expr.Call;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
+import loxInterpreter.Expr.Logical;
 import loxInterpreter.Expr.Unary;
 import loxInterpreter.Expr.Variable;
 import loxInterpreter.Stmt.Block;
 import loxInterpreter.Stmt.Expression;
+import loxInterpreter.Stmt.Function;
 import loxInterpreter.Stmt.If;
 import loxInterpreter.Stmt.Let;
 import loxInterpreter.Stmt.Print;
+import loxInterpreter.Stmt.Return;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
-	private Environment environment = new Environment();
+	final Environment globals = new Environment();
+	private Environment environment = globals;
+	
+	
+	
+	Interpreter(){
+		globals.define("clock", new LoxCallable(){
+			@Override
+			public int arity() {return 0;}
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				return (double)System.currentTimeMillis() / 1000.0;
+			}
+			
+			@Override
+			public String toString() { return "<native fn>"; }
+		});
+		globals.define("readCSV", new LoxCallable() {
+			DataFrame df;
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				this.df = new DataFrame((String)arguments.get(0));
+				return df;
+			}
+
+			@Override
+			public int arity() {
+				return 1;
+			}
+			
+			@Override
+			public String toString() {
+				return df.getNames().toString();
+			}
+			
+		});
+	}
 	
 	void interpret(List<Stmt> statements) {
 		try {
@@ -83,7 +128,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 		
 		return null;
 	}
-	
+		
 	private void checkNumberOperands(Token operator, Object left, Object right) {
 		if(left instanceof Double && right instanceof Double) return;
 		throw new RuntimeError(operator, "Operands must be numbers.");
@@ -202,6 +247,54 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 			execute(stmt.elseBranch);
 		}
 		return null;
+	}
+
+	@Override
+	public Object visitLogicalExpr(Logical expr) {
+		Object left = evaluate(expr.left);
+		
+		if(expr.operator.type == TokenType.OR) {
+			if (isTruthy(left)) return left;
+		} else
+			if(!isTruthy(left)) return left;
+		return evaluate(expr.right);
+	}
+
+	@Override
+	public Object visitCallExpr(Call expr) {
+		Object callee = evaluate(expr.callee);
+		
+		List<Object> arguments = new ArrayList<>();
+		for(Expr argument : expr.arguments) {
+			arguments.add(evaluate(argument));
+		}
+		
+		if(!(callee instanceof LoxCallable))
+			throw new RuntimeError(expr.paren, "Can only call functions.");
+		
+		LoxCallable function = (LoxCallable)callee;
+		
+		if(arguments.size() != function.arity()) {
+			throw new RuntimeError(expr.paren, "Expected " +
+					function.arity() + " arguments, but got " +
+					arguments.size() + ".");
+		}
+		
+		return function.call(this, arguments);
+	}
+
+	@Override
+	public Void visitFunctionStmt(Function stmt) {
+		LoxFunction function = new LoxFunction(stmt);
+		environment.define(stmt.name.lexeme, function);
+		return null;
+	}
+
+	@Override
+	public Void visitReturnStmt(Stmt.Return stmt) {
+		Object value = null;
+		if(stmt.value != null) value = evaluate(stmt.value);
+		throw new Ret(value);
 	}
 
 }

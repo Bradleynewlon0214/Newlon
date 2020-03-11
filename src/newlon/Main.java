@@ -3,6 +3,8 @@ package newlon;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import DataFrame.DataFrame;
+
 //TODO:FIX THIS
 public class Main {
 	
@@ -42,14 +44,14 @@ public class Main {
 			System.out.println(Arrays.toString(xValues));
 			String yValue = brk[1];
 			double[][] xs = new double[xValues.length][];
-			double[] y = df.columnToDouble(yValue);
+//			double[] y = df.columnToDouble(yValue);
 
 			for(int i = 0; i < xValues.length; i++) {
-				xs[i] = df.columnToDouble(xValues[i]);
+//				xs[i] = df.columnToDouble(xValues[i]);
 			}
 			
-			LinearModelResult lm = new LinearModelResult(yValue, xValues, y, xs);
-			lm.summary();	
+//			LinearModelResult lm = new LinearModelResult(yValue, xValues, y, xs);
+//			lm.summary();	
 		}
 		in.close();
 		

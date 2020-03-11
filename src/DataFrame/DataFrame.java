@@ -1,33 +1,44 @@
-package newlon;
+package DataFrame;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Set;
 
 
-
+//TODO : Type inference, 
 
 
 public class DataFrame {
 
-	private LinkedHashMap<String, ArrayList<Object>> data;
+	private HashMap<String, Series<Object>> data;
 	private String path;
 	private String delim;
+	
+	
+	public DataFrame(String path) {
+		this.path = path;
+		this.delim = ",";
+		readCSV(path, delim);
+	}
 	
 	public DataFrame(String path, String delim){
 		this.path = path;
 		this.delim = delim;
-		data = readCSV(path, delim);
+		readCSV(path, delim);
 	}
 	
-	public LinkedHashMap<String, ArrayList<Object>> readCSV(String path, String delim) {
+	
+	public Series<Object> get(int index) {
+		return data.get(index);
+	}
+	
+	public DataFrame readCSV(String path, String delim) {
 		BufferedReader buffReader = null;
 		String line = "";
-		LinkedHashMap<String, ArrayList<Object>> df = new LinkedHashMap<String, ArrayList<Object>>();
+		this.data = new HashMap<String, Series<Object>>();
 		
 		try {
 			
@@ -35,13 +46,13 @@ public class DataFrame {
 			String[] columns = buffReader.readLine().split(delim);
 			
 			for(String column: columns) {
-				df.put(column, new ArrayList<Object>());
+				data.put(column, new Series<Object>());
 			}
 			
 			while( (line = buffReader.readLine()) != null ) {
-				String[] contents = line.split(delim);
+				Object[] contents = line.split(delim);
 				for(int i = 0; i < contents.length; i++) {
-					df.get(columns[i]).add(contents[i]);
+					data.get(columns[i]).add(contents[i]);
 				}
 			}
 			
@@ -59,24 +70,11 @@ public class DataFrame {
 				}
 			}
 		}
-		return df;
+		return this;
 	}
 	
 	public Set<String> getNames() {
 		Set<String> keys = data.keySet();
 		return keys;
 	}
-	
-	public double[] columnToDouble(String key) {
-		
-		ArrayList<Object> test = data.get(key);
-		double[] tmax = new double[test.size()];
-		for(int i = 0; i < test.size(); i++) {
-			tmax[i] = Double.parseDouble(test.get(i).toString());
-		}
-		return tmax;
-	}
-
-	
-	
 }
