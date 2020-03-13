@@ -8,25 +8,47 @@ import java.util.Stack;
 import loxInterpreter.Expr.Assign;
 import loxInterpreter.Expr.Binary;
 import loxInterpreter.Expr.Call;
+import loxInterpreter.Expr.Get;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
 import loxInterpreter.Expr.Logical;
+import loxInterpreter.Expr.SeriesGroup;
+import loxInterpreter.Expr.Set;
+import loxInterpreter.Expr.This;
 import loxInterpreter.Expr.Unary;
+import loxInterpreter.Stmt.Class;
 import loxInterpreter.Stmt.Expression;
 import loxInterpreter.Stmt.Function;
 import loxInterpreter.Stmt.If;
 import loxInterpreter.Stmt.Print;
 import loxInterpreter.Stmt.Return;
+import loxInterpreter.Stmt.Series;
 
 
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 	private final Interpreter interpreter;
 	private final Stack<Map<String, Boolean>> scopes = new Stack<>();
 	
+	private FunctionType currentFunction = FunctionType.NONE;
+	
 	Resolver(Interpreter interpreter){
 		this.interpreter = interpreter;
 	}
 	
+	
+	private enum FunctionType{
+		NONE,
+		FUNCTION,
+		METHOD,
+		INITIALIZER
+	}
+	
+	private enum ClassType{
+		NONE,
+		CLASS
+	}
+	
+	private ClassType currentClass = ClassType.NONE;
 	
 	@Override
 	public Void visitBlockStmt(Stmt.Block stmt) {
@@ -71,7 +93,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 		stmt.accept(this);
 	}
 	
-	private void resolveFunction(Stmt.Function function) {
+	private void resolveFunction(Stmt.Function function, FunctionType type) {
+		FunctionType enclosingFunction = currentFunction;
+		currentFunction = type; 
+		
 		beginScope();
 		for(Token param : function.params) {
 			declare(param);
@@ -79,6 +104,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 		}
 		resolve(function.body);
 		endScope();
+		currentFunction = enclosingFunction;
 	}
 	
 	
@@ -94,6 +120,8 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 		if(scopes.isEmpty()) return;
 		
 		Map<String, Boolean> scope = scopes.peek();
+		if(scope.containsKey(name.lexeme))
+			Lox.error(name, "Variable with this name already declared in scope.");
 		scope.put(name.lexeme, false);
 	}
 	
@@ -114,7 +142,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
 	@Override
 	public Void visitExpressionStmt(Expression stmt) {
-		// TODO Auto-generated method stub
+		resolve(stmt.expression);
 		return null;
 	}
 
@@ -124,28 +152,38 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 		declare(stmt.name);
 		define(stmt.name);
 		
-		resolveFunction(stmt);
+		resolveFunction(stmt, FunctionType.FUNCTION);
 		return null;
 	}
 
 
 	@Override
 	public Void visitIfStmt(If stmt) {
-		// TODO Auto-generated method stub
+		resolve(stmt.condition);
+		resolve(stmt.thenBranch);
+		if(stmt.elseBranch != null) resolve(stmt.elseBranch);
 		return null;
 	}
 
 
 	@Override
 	public Void visitPrintStmt(Print stmt) {
-		// TODO Auto-generated method stub
+		resolve(stmt.expression);
 		return null;
 	}
 
 
 	@Override
 	public Void visitReturnStmt(Return stmt) {
-		// TODO Auto-generated method stub
+		if(currentFunction == FunctionType.NONE)
+			Lox.error(stmt.keyword, "Cannon return from top-level code");
+		
+		if(stmt.value != null){
+			if(currentFunction == FunctionType.INITIALIZER) {
+				Lox.error(stmt.keyword, "Cannot return a value from constructor.");
+			}
+			resolve(stmt.value);
+		}
 		return null;
 	}
 
@@ -160,41 +198,105 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 
 	@Override
 	public Void visitBinaryExpr(Binary expr) {
-		// TODO Auto-generated method stub
+		resolve(expr.left);
+		resolve(expr.right);
 		return null;
 	}
 
 
 	@Override
 	public Void visitCallExpr(Call expr) {
-		// TODO Auto-generated method stub
+		resolve(expr.callee);
+		for(Expr argument: expr.arguments) {
+			resolve(argument);
+		}
 		return null;
 	}
 
 
 	@Override
 	public Void visitGroupingExpr(Grouping expr) {
-		// TODO Auto-generated method stub
+		resolve(expr.expression);
 		return null;
 	}
 
 
 	@Override
 	public Void visitLiteralExpr(Literal expr) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	@Override
 	public Void visitLogicalExpr(Logical expr) {
-		// TODO Auto-generated method stub
+		resolve(expr.left);
+		resolve(expr.right);
 		return null;
 	}
 
 
 	@Override
 	public Void visitUnaryExpr(Unary expr) {
+		resolve(expr.right);
+		return null;
+	}
+
+	@Override
+	public Void visitClassStmt(Class stmt) {
+		ClassType enclosingClass = currentClass;
+		currentClass = ClassType.CLASS;
+		
+		declare(stmt.name);
+		define(stmt.name);
+		
+		beginScope();
+		scopes.peek().put("this", true);
+		
+		for(Stmt.Function method : stmt.methods) {
+			FunctionType declaration = FunctionType.METHOD;
+			if(method.name.lexeme.equals("construct"))
+				declaration = FunctionType.INITIALIZER;
+			resolveFunction(method, declaration);
+		}
+		
+		endScope();
+		currentClass = enclosingClass;
+		return null;
+	}
+
+	@Override
+	public Void visitGetExpr(Get expr) {
+		resolve(expr.object);
+		return null;
+	}
+
+	@Override
+	public Void visitSetExpr(Set expr) {
+		resolve(expr.value);
+		resolve(expr.object);
+		return null;
+	}
+
+	@Override
+	public Void visitThisExpr(This expr) {
+		if(currentClass == ClassType.NONE) {
+			Lox.error(expr.keyword, "Cannot use 'this' outside of a class.");
+			return null;
+		}
+		
+		
+		resolveLocal(expr, expr.keyword);
+		return null;
+	}
+
+	@Override
+	public Void visitSeriesStmt(Series stmt) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visitSeriesGroupExpr(SeriesGroup expr) {
 		// TODO Auto-generated method stub
 		return null;
 	}

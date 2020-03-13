@@ -23,11 +23,13 @@ public class Scanner {
 		
 		keywords = new HashMap<>();
 	    keywords.put("and",    AND);                       
-                     
+        keywords.put("series", SERIES);
+	    
 	    keywords.put("else",   ELSE);                      
 	    keywords.put("false",  FALSE);                     
                        
-	    keywords.put("fun",    FUN);                       
+	    keywords.put("fun",    FUN); 
+	    keywords.put("class", CLASS);
 	    keywords.put("if",     IF);                        
                       
 	    keywords.put("or",     OR);                        
@@ -145,7 +147,9 @@ public class Scanner {
 			case '(': addToken(LEFT_PAREN); break;
 			case ')': addToken(RIGHT_PAREN); break;
 		    case '{': addToken(LEFT_BRACE); break;     
-		    case '}': addToken(RIGHT_BRACE); break;    
+		    case '}': addToken(RIGHT_BRACE); break;
+		    case '[': addToken(LEFT_BRACKET); break;
+		    case ']': addToken(RIGHT_BRACKET); break;
 		    case ',': addToken(COMMA); break;          
 		    case '.': addToken(DOT); break;            
 		    case '-': addToken(match('>') ? ARROW_EQUAL : MINUS); break;         

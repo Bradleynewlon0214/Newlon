@@ -1,5 +1,7 @@
 package DataFrame;
 
+import java.util.Arrays;
+
 public class Series<E> {
 
 	private int size; //current number of elements in the list
@@ -134,5 +136,17 @@ public class Series<E> {
 	 */
 	public int size() {
 		return size;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for(int i = 0; i < size - 1; i++) {
+			sb.append(list[i] + ", ");
+		}
+		sb.append(list[size - 1]);
+		sb.append("]");
+		return sb.toString();
 	}
 }

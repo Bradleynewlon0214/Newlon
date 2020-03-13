@@ -1,20 +1,29 @@
 package loxInterpreter;
 
 import java.util.List;
+import java.util.Map;
 
 import DataFrame.DataFrame;
+import DataFrame.Series;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import loxInterpreter.Expr.Assign;
 import loxInterpreter.Expr.Binary;
 import loxInterpreter.Expr.Call;
+import loxInterpreter.Expr.Get;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
 import loxInterpreter.Expr.Logical;
+import loxInterpreter.Expr.SeriesGroup;
+import loxInterpreter.Expr.Set;
+import loxInterpreter.Expr.This;
 import loxInterpreter.Expr.Unary;
 import loxInterpreter.Expr.Variable;
 import loxInterpreter.Stmt.Block;
+import loxInterpreter.Stmt.Class;
 import loxInterpreter.Stmt.Expression;
 import loxInterpreter.Stmt.Function;
 import loxInterpreter.Stmt.If;
@@ -26,6 +35,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
 	final Environment globals = new Environment();
 	private Environment environment = globals;
+	private final Map<Expr, Integer> locals = new HashMap<>();
 	
 	
 	
@@ -42,6 +52,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 			@Override
 			public String toString() { return "<native fn>"; }
 		});
+		
+		
 		globals.define("readCSV", new LoxCallable() {
 			DataFrame df;
 			@Override
@@ -183,6 +195,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 	private void execute(Stmt stmt) {
 		stmt.accept(this);
 	}
+	
+	void resolve(Expr expr, int depth) {
+		locals.put(expr, depth);
+	}
 
 	@Override
 	public Void visitExpressionStmt(Expression stmt) {
@@ -209,13 +225,27 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
 	@Override
 	public Object visitVariableExpr(Variable expr) {
-		return environment.get(expr.name);
+		return lookUpVariable(expr.name, expr);
 	}
 
+	private Object lookUpVariable(Token name, Expr expr) {
+		Integer distance = locals.get(expr);
+		if(distance != null) {
+			return environment.getAt(distance, name.lexeme);
+		} else {
+			return globals.get(name);
+		}
+	}
+	
 	@Override
 	public Object visitAssignExpr(Assign expr) {
 		Object value = evaluate(expr.value);
-		environment.assign(expr.name, value);
+		Integer distance = locals.get(expr);
+		if(distance != null) {
+			environment.assignAt(distance, expr.name, value);
+		} else {
+			globals.assign(expr.name, value);
+		}
 		return value;
 	}
 
@@ -274,18 +304,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 		
 		LoxCallable function = (LoxCallable)callee;
 		
-		if(arguments.size() != function.arity()) {
-			throw new RuntimeError(expr.paren, "Expected " +
-					function.arity() + " arguments, but got " +
-					arguments.size() + ".");
-		}
+//		if(arguments.size() != function.arity()) {
+//			throw new RuntimeError(expr.paren, "Expected " +
+//					function.arity() + " arguments, but got " +
+//					arguments.size() + ".");
+//		}
 		
 		return function.call(this, arguments);
 	}
 
 	@Override
 	public Void visitFunctionStmt(Function stmt) {
-		LoxFunction function = new LoxFunction(stmt, environment);
+		System.out.println(stmt.body);
+		LoxFunction function = new LoxFunction(stmt, environment, false);
 		environment.define(stmt.name.lexeme, function);
 		return null;
 	}
@@ -295,6 +326,63 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 		Object value = null;
 		if(stmt.value != null) value = evaluate(stmt.value);
 		throw new Ret(value);
+	}
+
+	@Override
+	public Void visitClassStmt(Class stmt) {
+		environment.define(stmt.name.lexeme, null);
+
+		Map<String, LoxFunction> methods = new HashMap<>();
+		for(Stmt.Function method: stmt.methods) {
+			LoxFunction function = new LoxFunction(method, environment, method.name.lexeme.equals("construct"));
+			methods.put(method.name.lexeme, function);
+		}
+		LoxClass obj = new LoxClass(stmt.name.lexeme, methods);
+		environment.assign(stmt.name, obj);
+		return null;
+	}
+
+	@Override
+	public Object visitGetExpr(Get expr) {
+		Object object = evaluate(expr.object);
+		if(object instanceof LoxInstance)
+			return ((LoxInstance) object).get(expr.name);
+		throw new RuntimeError(expr.name, "Only instances have properties.");
+	}
+
+	@Override
+	public Object visitSetExpr(Set expr) {
+		Object object = evaluate(expr.object);
+		
+		if(!(object instanceof LoxInstance))
+			throw new RuntimeError(expr.name, "Only instances have fields");
+		
+		Object value = evaluate(expr.value);
+		((LoxInstance)object).set(expr.name, value);
+		return null;
+	}
+
+	@Override
+	public Object visitThisExpr(This expr) {
+		return lookUpVariable(expr.keyword, expr);
+	}
+
+	@Override
+	public Void visitSeriesStmt(Stmt.Series stmt) {
+		System.out.println(stmt.name.lexeme);
+		
+		for(Object lit : stmt.values) {
+			System.out.println(lit);
+		}
+		
+		System.out.println(stmt.values);
+		return null;
+	}
+
+	@Override
+	public Object visitSeriesGroupExpr(SeriesGroup expr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
