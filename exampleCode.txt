@@ -1,0 +1,5 @@
+fun fib(countdown, x, y){ if(countdown <= 1) return x; else return fib(countdown - 1, y, x+y); }
+
+fun factTail(x, accum) { if(x <= 1) return accum; else return factTail(x - 1, x * accum); }
+
+fun fact(n) { if(n <= 1) return n; else return n * fact(n-1); } print fact(5);
