@@ -7,6 +7,12 @@ fun fact(n) { if(n <= 1) return n; else return n * fact(n-1); } print fact(5);
 
 series x -> [1,2,3,"hello", "world"]; //series may hold numbers or strings
 
+mean(x); //mean of series
+sum(x); //sum of series
+variance(x); //variance of series
+
+
+
 dataframe df -> "filename.csv"
 
 let model -> ols(df, "y = x + z") //example formula
