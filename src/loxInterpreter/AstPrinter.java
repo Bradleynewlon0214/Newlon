@@ -7,7 +7,8 @@ import loxInterpreter.Expr.Get;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
 import loxInterpreter.Expr.Logical;
-import loxInterpreter.Expr.SeriesGroup;
+import loxInterpreter.Expr.SeriesGet;
+import loxInterpreter.Expr.SeriesSet;
 import loxInterpreter.Expr.Set;
 import loxInterpreter.Expr.This;
 import loxInterpreter.Expr.Unary;
@@ -108,7 +109,13 @@ public class AstPrinter implements Expr.Visitor<String>{
 	}
 
 	@Override
-	public String visitSeriesGroupExpr(SeriesGroup expr) {
+	public String visitSeriesGetExpr(SeriesGet expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitSeriesSetExpr(SeriesSet expr) {
 		// TODO Auto-generated method stub
 		return null;
 	}

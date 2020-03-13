@@ -15,6 +15,6 @@ public enum TokenType {
 	
 	//Keywords
 	AND, ELSE, FALSE, FUN, IF, OR, PRINT, RETURN, TRUE, LET, EOF, CLASS,
-	THIS, SERIES
+	THIS, SERIES, DATAFRAME
 
 }

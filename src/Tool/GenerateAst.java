@@ -11,17 +11,18 @@ public class GenerateAst {
 //			System.err.println("Usage: generate_ast <output_dir>");
 //			System.exit(1);
 //		}
-		String outputDir = "C:\\Users\\Bradl\\eclipse-workspace\\Newlon\\src\\loxInterpreter";
+		String outputDir = "C:\\Users\\bradley\\eclipse-workspace\\Newlon\\src\\loxInterpreter";
 	    defineAst(outputDir, "Expr", Arrays.asList(          
 	    	      	"Assign   : Token name, Expr value",
 	    			"Binary   : Expr left, Token operator, Expr right",
 	    			"Call	  : Expr callee, Token paren, List<Expr> arguments",
 	    			"Get 	  : Expr object, Token name",
 	    			"Grouping : Expr expression",
-	    			"SeriesGroup : List<Expr.Literal> values",
+	    			"SeriesGet: Expr object, Token index",
 	    			"Literal  : Object value",
 	    			"Logical  : Expr left, Token operator, Expr right",
 	    			"Set      : Expr object, Token name, Expr value",
+	    			"SeriesSet: Expr object, Token index, Expr value",
 	    			"This	  : Token keyword",
 	    			"Unary    : Token operator, Expr right",
 	    			"Variable : Token name"
@@ -36,7 +37,8 @@ public class GenerateAst {
 	    			"Print 		: Expr expression",
 	    			"Return		: Token keyword, Expr value",
 	    			"Let		: Token name, Expr initializer",
-	    			"Series		: Token name, Expr values"
+	    			"Series		: Token name, List<Object> values",
+	    			"DataFrame	: Token name, Object param"
 	    		));
 	}
 	

@@ -24,7 +24,8 @@ public class Scanner {
 		keywords = new HashMap<>();
 	    keywords.put("and",    AND);                       
         keywords.put("series", SERIES);
-	    
+	    keywords.put("dataframe", DATAFRAME);
+        
 	    keywords.put("else",   ELSE);                      
 	    keywords.put("false",  FALSE);                     
                        

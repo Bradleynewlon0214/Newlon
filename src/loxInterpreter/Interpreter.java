@@ -17,7 +17,8 @@ import loxInterpreter.Expr.Get;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
 import loxInterpreter.Expr.Logical;
-import loxInterpreter.Expr.SeriesGroup;
+import loxInterpreter.Expr.SeriesGet;
+import loxInterpreter.Expr.SeriesSet;
 import loxInterpreter.Expr.Set;
 import loxInterpreter.Expr.This;
 import loxInterpreter.Expr.Unary;
@@ -30,6 +31,7 @@ import loxInterpreter.Stmt.If;
 import loxInterpreter.Stmt.Let;
 import loxInterpreter.Stmt.Print;
 import loxInterpreter.Stmt.Return;
+import newlon.LinearModelResult;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
@@ -53,13 +55,15 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 			public String toString() { return "<native fn>"; }
 		});
 		
-		
-		globals.define("readCSV", new LoxCallable() {
-			DataFrame df;
+		globals.define("mean", new LoxCallable() {
+
 			@Override
 			public Object call(Interpreter interpreter, List<Object> arguments) {
-				this.df = new DataFrame((String)arguments.get(0));
-				return df;
+				if (arguments.get(0) instanceof LoxSeries) {
+					LoxSeries series = (LoxSeries) arguments.get(0);
+					return series.mean();
+				}
+				throw new RuntimeError(null, "expect a series");
 			}
 
 			@Override
@@ -67,11 +71,75 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 				return 1;
 			}
 			
+		});
+		
+		globals.define("sum", new LoxCallable() {
+
 			@Override
-			public String toString() {
-				return df.getNames().toString();
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (arguments.get(0) instanceof LoxSeries) {
+					LoxSeries series = (LoxSeries) arguments.get(0);
+					return series.sum();
+				}
+				throw new RuntimeError(null, "expect a series");
+			}
+
+			@Override
+			public int arity() {
+				return 1;
 			}
 			
+		});
+		
+		globals.define("variance", new LoxCallable() {
+
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if (arguments.get(0) instanceof LoxSeries) {
+					LoxSeries series = (LoxSeries) arguments.get(0);
+					return series.variance();
+				}
+				throw new RuntimeError(null, "expect a series");
+			}
+
+			@Override
+			public int arity() {
+				return 1;
+			}
+			
+		});
+		
+		
+		globals.define("ols", new LoxCallable() {
+			
+			@Override
+			public Object call(Interpreter interpreter, List<Object> arguments) {
+				if(!(arguments.get(0) instanceof DataFrame))
+					throw new RuntimeError(null, "Expect a dataframe object as first argument.");
+				
+				DataFrame df = (DataFrame)arguments.get(0);
+				String formula = (String)arguments.get(1);
+				String[] s = formula.split("=");
+				String yName = s[0].strip();
+				
+				double[] y = df.get(yName).toArray();	
+				
+				
+				String[] xNames = s[1].split("\\+");
+				double[][] xs = new double[xNames.length][];
+				for(int i = 0; i < xNames.length; i++) {
+					xs[i] = df.get(xNames[i].strip()).toArray();
+				}
+				
+				
+//				dataframe df -> "C:\Users\bradley\Desktop\R\hw_data.csv"; let mod -> ols(df, "kwh = tmin + tmax + cldcvr + wndspd");
+				return new LinearModelResult(yName, xNames, y, xs);
+			}
+
+			@Override
+			public int arity() {
+				return 2;
+			}
 		});
 	}
 	
@@ -369,19 +437,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
 	@Override
 	public Void visitSeriesStmt(Stmt.Series stmt) {
-		System.out.println(stmt.name.lexeme);
-		
-		for(Object lit : stmt.values) {
-			System.out.println(lit);
-		}
-		
-		System.out.println(stmt.values);
+		environment.define(stmt.name.lexeme, new LoxSeries(stmt.values));
 		return null;
 	}
 
 	@Override
-	public Object visitSeriesGroupExpr(SeriesGroup expr) {
+	public Object visitSeriesGetExpr(SeriesGet expr) {
+		Object object = evaluate(expr.object);
+		if(!(object instanceof LoxSeries))
+			throw new RuntimeError(expr.index, "Only series can be subsetted.");
+		Double d = (Double)expr.index.literal;
+		Integer i = d.intValue();
+		return ((LoxSeries)object).get(i);
+	}
+
+	@Override
+	public Object visitSeriesSetExpr(SeriesSet expr) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visitDataFrameStmt(Stmt.DataFrame stmt) {
+		environment.define(stmt.name.lexeme, new DataFrame((String)stmt.param));
 		return null;
 	}
 

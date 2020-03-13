@@ -9,10 +9,11 @@ abstract class Expr {
 	R visitCallExpr(Call expr);
 	R visitGetExpr(Get expr);
 	R visitGroupingExpr(Grouping expr);
-	R visitSeriesGroupExpr(SeriesGroup expr);
+	R visitSeriesGetExpr(SeriesGet expr);
 	R visitLiteralExpr(Literal expr);
 	R visitLogicalExpr(Logical expr);
 	R visitSetExpr(Set expr);
+	R visitSeriesSetExpr(SeriesSet expr);
 	R visitThisExpr(This expr);
 	R visitUnaryExpr(Unary expr);
 	R visitVariableExpr(Variable expr);
@@ -84,16 +85,18 @@ abstract class Expr {
 
 	final Expr expression;
 	}
- static class SeriesGroup extends Expr {
-	SeriesGroup(List<Expr.Literal> values) {
-	this.values=values;
+ static class SeriesGet extends Expr {
+	SeriesGet(Expr object, Token index) {
+	this.object=object;
+	this.index=index;
 	}
 
 	<R> R accept(Visitor<R> visitor) {
-	return visitor.visitSeriesGroupExpr(this);
+	return visitor.visitSeriesGetExpr(this);
 	}
 
-	final List<Expr.Literal> values;
+	final Expr object;
+	final Token index;
 	}
  static class Literal extends Expr {
 	Literal(Object value) {
@@ -134,6 +137,21 @@ abstract class Expr {
 
 	final Expr object;
 	final Token name;
+	final Expr value;
+	}
+ static class SeriesSet extends Expr {
+	SeriesSet(Expr object, Token index, Expr value) {
+	this.object=object;
+	this.index=index;
+	this.value=value;
+	}
+
+	<R> R accept(Visitor<R> visitor) {
+	return visitor.visitSeriesSetExpr(this);
+	}
+
+	final Expr object;
+	final Token index;
 	final Expr value;
 	}
  static class This extends Expr {

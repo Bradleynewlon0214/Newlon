@@ -39,5 +39,10 @@ public class LinearModelResult extends LinearModel {
 		
 	}
 	
+	@Override
+	public String toString() {
+		summary();
+		return "worked";
+	}
 
 }

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Set;
 
 
-//TODO : Type inference, 
 
 
 public class DataFrame {
@@ -31,9 +30,9 @@ public class DataFrame {
 		readCSV(path, delim);
 	}
 	
-	
-	public Series<Object> get(int index) {
-		return data.get(index);
+		
+	public Series<Object> get(String key){
+		return data.get(key);
 	}
 	
 	public DataFrame readCSV(String path, String delim) {

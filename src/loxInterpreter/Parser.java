@@ -84,6 +84,7 @@ public class Parser {
 			if(match(LET)) return varDeclaration();
 			if(match(FUN)) return function("function");
 			if(match(SERIES)) return series();
+			if(match(DATAFRAME)) return dataFrame();
 			return statement();
 		} catch(ParseError error) {
 			synchronize();
@@ -105,8 +106,23 @@ public class Parser {
 		return new Stmt.Class(name, methods);
 	}
 	
+	private Stmt dataFrame() {
+		Token name = consume(IDENTIFIER, "Expect dataframe name.");
+		consume(ARROW_EQUAL, "Expect assignment ->");
+		Object location;
+		if(match(STRING)) {
+			location = previous().literal;
+		} else {
+			location = null;
+		}
+		consume(SEMICOLON, "Expect ';' after expression");
+		
+		return new Stmt.DataFrame(name, location);
+	}
+	
 	private Stmt series() {
-		Token name = consume(IDENTIFIER, "Expect series name");
+		Token name = consume(IDENTIFIER, "Expect series name.");
+		consume(ARROW_EQUAL, "Expect assignment '->'");
 		List<Object> seriesLiterals = new ArrayList<>();
 		
 		if(match(LEFT_BRACKET)) {
@@ -119,7 +135,7 @@ public class Parser {
 			consume(RIGHT_BRACKET, "Expect '[' after series declaration.");
 		}
 			
-		consume(SEMICOLON, "Expect ';' after statement value.");
+		consume(SEMICOLON, "Expect ';' after statement expression.");
 		
 		return new Stmt.Series(name, seriesLiterals);
 	}
@@ -336,6 +352,10 @@ public class Parser {
 			else if(match(DOT)){
 				Token name = consume(IDENTIFIER, "Expect property name after '.'.");
 				expr = new Expr.Get(expr, name);
+			} else if(match(LEFT_BRACKET)) {
+				Token index = consume(NUMBER, "Expect an index after '['");
+				consume(RIGHT_BRACKET, "Expect ']' after index");
+				expr = new Expr.SeriesGet(expr, index);
 			}
 			else
 				break;

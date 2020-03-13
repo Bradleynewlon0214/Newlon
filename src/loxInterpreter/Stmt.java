@@ -13,6 +13,7 @@ abstract class Stmt {
 	R visitReturnStmt(Return stmt);
 	R visitLetStmt(Let stmt);
 	R visitSeriesStmt(Series stmt);
+	R visitDataFrameStmt(DataFrame stmt);
  }
  static class Block extends Stmt {
 	Block(List<Stmt> statements) {
@@ -117,9 +118,9 @@ abstract class Stmt {
 	final Expr initializer;
 	}
  static class Series extends Stmt {
-	Series(Token name, List<Object> seriesLiterals) {
+	Series(Token name, List<Object> values) {
 	this.name=name;
-	this.values=seriesLiterals;
+	this.values=values;
 	}
 
 	<R> R accept(Visitor<R> visitor) {
@@ -128,6 +129,19 @@ abstract class Stmt {
 
 	final Token name;
 	final List<Object> values;
+	}
+ static class DataFrame extends Stmt {
+	DataFrame(Token name, Object param) {
+	this.name=name;
+	this.param=param;
+	}
+
+	<R> R accept(Visitor<R> visitor) {
+	return visitor.visitDataFrameStmt(this);
+	}
+
+	final Token name;
+	final Object param;
 	}
 
 	abstract <R> R accept(Visitor<R> visitor);

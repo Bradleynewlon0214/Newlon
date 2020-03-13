@@ -138,6 +138,30 @@ public class Series<E> {
 		return size;
 	}
 	
+	
+	public double sum() {
+		double sum = 0;
+		for(int i = 0; i < size; i++) {
+			sum += (double)list[i];
+		}
+		return sum;
+	}
+	
+	public double mean() {
+		return sum() / size;
+	}
+	
+	public double variance() {
+		double variance = 0;
+		double xBar = mean();
+		
+		for(int i = 0; i < size; i++) {
+			variance += Math.pow((double)list[i] - xBar, 2);
+		}
+		
+		return variance / (size - 1);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -148,5 +172,13 @@ public class Series<E> {
 		sb.append(list[size - 1]);
 		sb.append("]");
 		return sb.toString();
+	}
+	
+	public double[] toArray(){
+		double[] results = new double[size];
+		for (int i = 0; i < size; i++) {
+			results[i] = Double.parseDouble(list[i].toString());
+		}
+		return results;
 	}
 }

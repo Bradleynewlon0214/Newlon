@@ -12,11 +12,13 @@ import loxInterpreter.Expr.Get;
 import loxInterpreter.Expr.Grouping;
 import loxInterpreter.Expr.Literal;
 import loxInterpreter.Expr.Logical;
-import loxInterpreter.Expr.SeriesGroup;
+import loxInterpreter.Expr.SeriesGet;
+import loxInterpreter.Expr.SeriesSet;
 import loxInterpreter.Expr.Set;
 import loxInterpreter.Expr.This;
 import loxInterpreter.Expr.Unary;
 import loxInterpreter.Stmt.Class;
+import loxInterpreter.Stmt.DataFrame;
 import loxInterpreter.Stmt.Expression;
 import loxInterpreter.Stmt.Function;
 import loxInterpreter.Stmt.If;
@@ -296,7 +298,19 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
 	}
 
 	@Override
-	public Void visitSeriesGroupExpr(SeriesGroup expr) {
+	public Void visitSeriesGetExpr(SeriesGet expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visitSeriesSetExpr(SeriesSet expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Void visitDataFrameStmt(DataFrame stmt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
