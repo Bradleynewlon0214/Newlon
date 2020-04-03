@@ -13,7 +13,7 @@ variance(x); //variance of series
 
 
 
-dataframe df -> "filename.csv"
+dataframe df -> "filename.csv";
 
 let model -> ols(df, "y = x + z") //example formula
 
