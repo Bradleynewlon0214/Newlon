@@ -332,7 +332,7 @@ public class LinearModel {
 		else return 0;
 	}
 	
-	//this is retarded
+	//don't ask
 	public void fit() {
 		
 		estimateBetas();

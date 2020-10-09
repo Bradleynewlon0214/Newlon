@@ -1,9 +1,10 @@
 *.classpath
-.classpath
+.classpathgith
 *.project
 .project
 *.settings
 .settings
 .settings/
-
+.idea/
+Newlon.iml
 bin/
