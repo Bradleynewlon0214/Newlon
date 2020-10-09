@@ -1,5 +1,30 @@
+//functions do not have to be inline
 fun fib(countdown, x, y){ if(countdown <= 1) return x; else return fib(countdown - 1, y, x+y); }
 
 fun factTail(x, accum) { if(x <= 1) return accum; else return factTail(x - 1, x * accum); }
 
 fun fact(n) { if(n <= 1) return n; else return n * fact(n-1); } print fact(5);
+
+series x -> [1,2,3,"hello", "world"]; //series may hold numbers or strings
+
+mean(x); //mean of series
+sum(x); //sum of series
+variance(x); //variance of series
+
+
+
+dataframe df -> "filename.csv";
+
+let model -> ols(df, "y = x + z") //example formula
+
+class Box(){
+  construct(x, y){
+    this.x -> x;
+    this.y -> y;
+  }
+  
+  area() {
+    print this.x * this.y;
+  }
+  
+}
