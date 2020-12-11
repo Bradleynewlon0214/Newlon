@@ -20,7 +20,7 @@ The language itself, absent statistics, is largely just the Lox programming lang
 
 
 ## Usage
-If you would like to test the language in it's current form, just clone this repo and import the project into the IDE of your choice and run Lox.java.
+If you would like to test the language in it's current form, just clone this repo and import the project into the IDE of your choice and run Lox.java which starts the REPL.
 
 
 Please see exampleCode.txt for code examples.
